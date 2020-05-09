@@ -25,11 +25,9 @@ public:
     class Statemachine;
 
     class TopState {
-    private:
         using TThisState  = TopState;
-    protected:
-        TopState() {}
     public:
+        TopState() {}
         static TopState* GetInstance() {
             static TopState singleInstance;
             return &singleInstance;
@@ -47,14 +45,6 @@ public:
         }
     };
 
-    class TopStateStart: public TopState {
-    public:
-        static TopState* GetInstance() {
-            static TopStateStart singleInstance;
-            return &singleInstance;
-        }
-    };
-
     class Statemachine {
         bool          m_bIsExternTrans;
     protected:
@@ -65,6 +55,8 @@ public:
         TopState*     m_pCurrentState;
         Statemachine* m_pParentStm;
         TopState*     m_pSourceState;
+
+        static TopState      m_TopStateStart;
     public:
         Statemachine():
             m_pParentStm(nullptr),
@@ -141,7 +133,7 @@ public:
                 return false;
             }
             if (pEntryPoint == nullptr) {
-                m_pPseudostate = TopStateStart::GetInstance();
+                m_pPseudostate = &m_TopStateStart;
             } else {
                 m_pPseudostate = pEntryPoint;
             }
@@ -160,7 +152,6 @@ public:
 /*------------------------------------------ Specific --------------------------------------------*/
 using Statemachine = Common::Statemachine;
 using TopState = Common::TopState;
-using TopStateStart = Common::TopStateStart;
 
 class S18Stm: public Statemachine {
 public:
@@ -169,16 +160,7 @@ public:
         return &singleInstance;
     }
 
-    class S18Entry1: public TopState {
-        using TThisState  = S18Entry1;
-    protected:
-        S18Entry1() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-    };
+    static TopState m_S18Entry1;
     /*------------------------------------------ S181 --------------------------------------------*/
     class S181: public TopState {
         using TThisState  = S181;
@@ -280,12 +262,12 @@ public:
     virtual bool DefaultTrans(Context* pContext) {
         bool bResult = false;
         /* substms' run-to-completion */
-        if (m_pPseudostate == TopStateStart::GetInstance()) {
+        if (m_pPseudostate == &m_TopStateStart) {
             BgnTrans(pContext, S181::GetInstance());
             std::cout << typeid(m_pPseudostate).name() << " init\n";
             EndTrans(pContext);
             bResult = true;
-        } else if (m_pPseudostate == S18Entry1::GetInstance()) {
+        } else if (m_pPseudostate == &m_S18Entry1) {
             BgnTrans(pContext, S181::GetInstance());
             std::cout << typeid(m_pPseudostate).name() << " init\n";
             EndTrans(pContext);
@@ -315,16 +297,8 @@ public:
         return &singleInstance;
     }
 
-    class S111Entry1: public TopState {
-        using TThisState  = S111Entry1;
-    protected:
-        S111Entry1() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-    };
+    static TopState m_S111Entry1;
+
     /*------------------------------------------ S14 --------------------------------------------*/
     class S14: public TopState {
         using TThisState  = S14;
@@ -412,12 +386,12 @@ public:
     virtual bool DefaultTrans(Context* pContext) {
         bool bResult = false;
         /* substms' run-to-completion */
-        if (m_pPseudostate == TopStateStart::GetInstance()) {
+        if (m_pPseudostate == &m_TopStateStart) {
             BgnTrans(pContext, S15::GetInstance());
             std::cout << typeid(m_pPseudostate).name() << " init\n";
             EndTrans(pContext);
             bResult = true;
-        } else if (m_pPseudostate == S111Entry1::GetInstance()) {
+        } else if (m_pPseudostate == &m_S111Entry1) {
             BgnTrans(pContext, S14::GetInstance());
             std::cout << typeid(m_pPseudostate).name() << " init\n";
             EndTrans(pContext);
@@ -447,27 +421,9 @@ public:
         return &singleInstance;
     }
 
-    class S112Entry1: public TopState {
-        using TThisState  = S112Entry1;
-    protected:
-        S112Entry1() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-    };
+    static TopState m_S112Entry1;
+    static TopState m_S112Entry2;
 
-    class S112Entry2: public TopState {
-        using TThisState  = S112Entry2;
-    protected:
-        S112Entry2() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-    };
     /*------------------------------------------ S14 --------------------------------------------*/
     class S16: public TopState {
         using TThisState  = S16;
@@ -555,17 +511,17 @@ public:
     virtual bool DefaultTrans(Context* pContext) {
         bool bResult = false;
         /* substms' run-to-completion */
-        if (m_pPseudostate == TopStateStart::GetInstance()) {
+        if (m_pPseudostate == &m_TopStateStart) {
             BgnTrans(pContext, S16::GetInstance());
             std::cout << "s111 init\n";
             EndTrans(pContext);
             bResult = true;
-        } else if (m_pPseudostate == S112Entry1::GetInstance()) {
+        } else if (m_pPseudostate == &m_S112Entry1) {
             BgnTrans(pContext, S16::GetInstance());
             std::cout << typeid(m_pPseudostate).name() << " init\n";
             EndTrans(pContext);
             bResult = true;
-        } else if (m_pPseudostate == S112Entry2::GetInstance()) {
+        } else if (m_pPseudostate == &m_S112Entry2) {
             BgnTrans(pContext, S17::GetInstance());
             std::cout << typeid(m_pPseudostate).name() << " init\n";
             EndTrans(pContext);
@@ -631,7 +587,7 @@ public:
             switch (nEventId) {
             case E1:
                 if (std::cout << "g1\n") {
-                    pStm->BgnTrans(pContext, S2::GetInstance(), S2Start::GetInstance());
+                    pStm->BgnTrans(pContext, S2::GetInstance(), &m_S2Start);
                     pStm->EndTrans(pContext);
                     bResult = true;
                 }
@@ -646,7 +602,7 @@ public:
                             pStm->EndTrans(pContext);
                             bResult = true;
                         } else {
-                            pStm->BgnTrans(pContext, S6::GetInstance(), S6Start::GetInstance());
+                            pStm->BgnTrans(pContext, S6::GetInstance(), &m_S6Start);
                             pStm->EndTrans(pContext);
                             bResult = true;
                         }
@@ -658,7 +614,7 @@ public:
                             pStm->EndTrans(pContext);
                             bResult = true;
                         } else {
-                            pStm->BgnTrans(pContext, S9::GetInstance(), S9Start::GetInstance());
+                            pStm->BgnTrans(pContext, S9::GetInstance(), &m_S9Start);
                             pStm->EndTrans(pContext);
                             bResult = true;
                         }
@@ -710,7 +666,7 @@ public:
                         pStm->EndTrans(pContext);
                         bResult = true;
                     } else {
-                        pStm->BgnTrans(pContext, S6::GetInstance(), S6Start::GetInstance());
+                        pStm->BgnTrans(pContext, S6::GetInstance(), &m_S6Start);
                         pStm->EndTrans(pContext);
                         bResult = true;
                     }
@@ -731,16 +687,7 @@ public:
         }
     };
 
-    class S2Start: public S2 {
-        using TThisState  = S2Start;
-    protected:
-        S2Start() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-    };
+    static TopState m_S2Start;
 
     class S3: public S2 {
         using TThisState  = S3;
@@ -873,7 +820,7 @@ public:
             switch (nEventId) {
             case E0:
                 if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, Junction::GetInstance());
+                    pStm->BgnTrans(pContext, &m_Junction);
                     std::cout << "a\n";
                     pStm->EndTrans(pContext);
                     bResult = true;
@@ -919,7 +866,7 @@ public:
             switch (nEventId) {
             case E1:
                 if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, Junction::GetInstance());
+                    pStm->BgnTrans(pContext, &m_Junction);
                     std::cout << "a\n";
                     pStm->EndTrans(pContext);
                     bResult = true;
@@ -940,16 +887,7 @@ public:
         }
     };
 
-    class S6Start: public S6 {
-        using TThisState  = S6Start;
-    protected:
-        S6Start() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-    };
+    static TopState m_S6Start;
 
     class S7: public S6 {
         using TThisState  = S7;
@@ -999,7 +937,6 @@ public:
     };
 
     class S8: public S6 {
-    private:
         using TThisState  = S8;
         using TSuperState = S6;
     protected:
@@ -1040,7 +977,6 @@ public:
 
     /*------------------------------------------- S9 ---------------------------------------------*/
     class S9: public TopState {
-    private:
         using TThisState  = S9;
         using TSuperState = TopState;
     protected:
@@ -1089,9 +1025,9 @@ public:
                 break;
             case E3:
                 if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, S11::GetInstance(), S11Start::GetInstance());
-                    S111Stm::GetInstance()->Reset(pContext, pStm, S111Stm::S111Entry1::GetInstance());
-                    S112Stm::GetInstance()->Reset(pContext, pStm, S112Stm::S112Entry1::GetInstance());
+                    pStm->BgnTrans(pContext, S11::GetInstance(), &m_S11Start);
+                    S111Stm::GetInstance()->Reset(pContext, pStm, &S111Stm::m_S111Entry1);
+                    S112Stm::GetInstance()->Reset(pContext, pStm, &S112Stm::m_S112Entry1);
                     std::cout << "a\n";
                     pStm->EndTrans(pContext);
                     bResult = true;
@@ -1104,19 +1040,9 @@ public:
         }
     };
 
-    class S9Start: public S9 {
-        using TThisState  = S9Start;
-    protected:
-        S9Start() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-    };
+    static TopState m_S9Start;
 
     class S91: public S9 {
-    private:
         using TThisState  = S91;
         using TSuperState = S9;
     protected:
@@ -1156,7 +1082,6 @@ public:
     };
 
     class S92: public S9 {
-    private:
         using TThisState  = S92;
         using TSuperState = S9;
     protected:
@@ -1197,7 +1122,6 @@ public:
 
     /*------------------------------------------- S10 --------------------------------------------*/
     class S10: public TopState {
-    private:
         using TThisState  = S10;
         using TSuperState = TopState;
     protected:
@@ -1248,11 +1172,11 @@ public:
                     } else if (n - '0' == 1) {
                         pStm->BgnTrans(pContext, S18::GetInstance());
                         std::cout << "a\n";
-                        S18Stm::GetInstance()->Reset(pContext, pStm, S18Stm::S18Entry1::GetInstance());
+                        S18Stm::GetInstance()->Reset(pContext, pStm, &S18Stm::m_S18Entry1);
                         pStm->EndTrans(pContext);
                         bResult = true;
                     } else {
-                        pStm->BgnTrans(pContext, S11::GetInstance(), S11Start::GetInstance());
+                        pStm->BgnTrans(pContext, S11::GetInstance(), &m_S11Start);
                         std::cout << "a\n";
                         pStm->EndTrans(pContext);
                         bResult = true;
@@ -1268,7 +1192,6 @@ public:
 
     /*------------------------------------------- S11 --------------------------------------------*/
     class S11: public TopState {
-    private:
         using TThisState  = S11;
         using TSuperState = TopState;
     protected:
@@ -1326,19 +1249,9 @@ public:
         }
     };
 
-    class S11Start: public S11 {
-        using TThisState  = S11Start;
-    protected:
-        S11Start() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-    };
+    static TopState m_S11Start;
 
     class S12: public S11 {
-    private:
         using TThisState  = S12;
         using TSuperState = S11;
     protected:
@@ -1385,7 +1298,6 @@ public:
     };
 
     class S13: public S11 {
-    private:
         using TThisState  = S13;
         using TSuperState = S11;
     protected:
@@ -1431,16 +1343,7 @@ public:
     };
 
     /*----------------------------------------- Junction -----------------------------------------*/
-    class Junction: public TopState {
-        using TThisState  = Junction;
-    protected:
-        Junction() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-    };
+    static TopState m_Junction;
 
     /*------------------------------------------- S18 --------------------------------------------*/
     class S18: public TopState {
@@ -1490,7 +1393,7 @@ public:
                         pStm->EndTrans(pContext);
                         bResult = true;
                     } else {
-                        pStm->BgnTrans(pContext, S6::GetInstance(), S6Start::GetInstance());
+                        pStm->BgnTrans(pContext, S6::GetInstance(), &m_S6Start);
                         pStm->EndTrans(pContext);
                         bResult = true;
                     }
@@ -1590,9 +1493,9 @@ public:
                 break;
             case E2:
                 if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, S11::GetInstance(), S11Start::GetInstance());
+                    pStm->BgnTrans(pContext, S11::GetInstance(), &m_S11Start);
                     std::cout << "a\n";
-                    S112Stm::GetInstance()->Reset(pContext, pStm, S112Stm::S112Entry2::GetInstance());
+                    S112Stm::GetInstance()->Reset(pContext, pStm, &S112Stm::m_S112Entry2);
                     pStm->EndTrans(pContext);
                     bResult = true;
                 }
@@ -1608,32 +1511,32 @@ public:
     virtual bool DefaultTrans(Context* pContext) {
         bool bResult = false;
         /* substms' run-to-completion */
-        if (m_pPseudostate == TopStateStart::GetInstance()) {
+        if (m_pPseudostate == &m_TopStateStart) {
             BgnTrans(pContext, S1::GetInstance());
             std::cout << typeid(m_pPseudostate).name() << " init\n";
             EndTrans(pContext);
             bResult = true;
-        } else if (m_pPseudostate == S2Start::GetInstance()) {
+        } else if (m_pPseudostate == &m_S2Start) {
             BgnTrans(pContext, S3::GetInstance());
             std::cout << typeid(m_pPseudostate).name() << " init\n";
             EndTrans(pContext);
             bResult = true;
-        } else if (m_pPseudostate == S6Start::GetInstance()) {
+        } else if (m_pPseudostate == &m_S6Start) {
             BgnTrans(pContext, S7::GetInstance());
             std::cout << typeid(m_pPseudostate).name() << " init\n";
             EndTrans(pContext);
             bResult = true;
-        } else if (m_pPseudostate == S9Start::GetInstance()) {
+        } else if (m_pPseudostate == &m_S9Start) {
             BgnTrans(pContext, S91::GetInstance());
             std::cout << typeid(m_pPseudostate).name() << " init\n";
             EndTrans(pContext);
             bResult = true;
-        } else if (m_pPseudostate == S11Start::GetInstance()) {
+        } else if (m_pPseudostate == &m_S11Start) {
             BgnTrans(pContext, S12::GetInstance());
             std::cout << typeid(m_pPseudostate).name() << " init\n";
             EndTrans(pContext);
             bResult = true;
-        } else if (m_pPseudostate == Junction::GetInstance()) {
+        } else if (m_pPseudostate == &m_Junction) {
             BgnTrans(pContext, S18::GetInstance());
             std::cout << typeid(m_pPseudostate).name() << " init\n";
             EndTrans(pContext);
@@ -1677,6 +1580,16 @@ TopState* MainStm::m_pS6History = nullptr;
 TopState* MainStm::m_pS9History = nullptr;
 
 /*---------------------------------------------------------------------------------------------*/
+Common::TopState Common::Statemachine::m_TopStateStart;
+Common::TopState S18Stm::m_S18Entry1;
+Common::TopState S111Stm::m_S111Entry1;
+Common::TopState S112Stm::m_S112Entry1;
+Common::TopState S112Stm::m_S112Entry2;
+Common::TopState MainStm::m_S2Start;
+Common::TopState MainStm::m_S6Start;
+Common::TopState MainStm::m_S9Start;
+Common::TopState MainStm::m_S11Start;
+Common::TopState MainStm::m_Junction;
 
 int main() {
     std::cout << "Hello World!\n";
