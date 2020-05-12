@@ -12,7 +12,6 @@ enum EventId {
     E3,
     E4,
     E5,
-    S18Exit1,
 };
 
 union EventParams {
@@ -50,13 +49,13 @@ public:
     protected:
         TopState*     m_pLCAState;
         TopState*     m_pTargetState;
-        TopState*     m_pPseudostate;
     public:
+        TopState*     m_pPseudostate;
         TopState*     m_pCurrentState;
         Statemachine* m_pParentStm;
         TopState*     m_pSourceState;
 
-        static TopState      m_TopStateStart;
+        TopState      m_TopStateStart;
     public:
         Statemachine():
             m_pParentStm(nullptr),
@@ -150,1421 +149,1409 @@ public:
 };
 
 /*------------------------------------------ Specific --------------------------------------------*/
-using Statemachine = Common::Statemachine;
-using TopState = Common::TopState;
+class Context {
 
-class S18Stm: public Statemachine {
-public:
-    static Statemachine* GetInstance() {
-        static S18Stm singleInstance;
-        return &singleInstance;
-    }
+    using Statemachine = Common::Statemachine;
+    using TopState = Common::TopState;
 
-    static TopState m_S18Entry1;
-    /*------------------------------------------ S181 --------------------------------------------*/
-    class S181: public TopState {
-        using TThisState  = S181;
-        using TSuperState = TopState;
-    protected:
-        S181() {}
+    class S18Stm: public Statemachine {
     public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                /* entry */
-                std::cout << typeid(this).name() << " entry\n";
+
+        TopState m_S18Entry1;
+        /*------------------------------------------ S181 --------------------------------------------*/
+        class S181: public TopState {
+            using TThisState  = S181;
+            using TSuperState = TopState;
+        protected:
+            S181() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
             }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E0:
-                if (std::cout << "g1\n") {
-                    pStm->BgnTrans(pContext, S182::GetInstance());
-                    pStm->EndTrans(pContext);
-                    bResult = true;
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    /* entry */
+                    std::cout << typeid(this).name() << " entry\n";
                 }
-                break;
-            default:
-                break;
             }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E0:
+                    if (std::cout << "g1\n") {
+                        pStm->BgnTrans(pContext, S182::GetInstance());
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        /*------------------------------------------ S182 --------------------------------------------*/
+        class S182: public TopState {
+            using TThisState  = S182;
+            using TSuperState = TopState;
+        protected:
+            S182() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    /* entry */
+                    std::cout << typeid(this).name() << " entry\n";
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E2:
+                    if (std::cout << "g1\n") {
+                        pStm->BgnTrans(pContext, TopState::GetInstance());
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                case E3:
+                    if (std::cout << "g1\n") {
+                        pStm->BgnTrans(pContext, TopState::GetInstance());
+                        pStm->m_pParentStm->m_pPseudostate = &((MainStm*)pStm->m_pParentStm)->m_S18Exit1;
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+        /*-------------------------------------- DefaultTrans ----------------------------------------*/
+        virtual bool DefaultTrans(Context* pContext) {
+            bool bResult = false;
+            /* substms' run-to-completion */
+            if (m_pPseudostate == &m_TopStateStart) {
+                BgnTrans(pContext, S181::GetInstance());
+                std::cout << typeid(m_pPseudostate).name() << " init\n";
+                EndTrans(pContext);
+                bResult = true;
+            } else if (m_pPseudostate == &m_S18Entry1) {
+                BgnTrans(pContext, S181::GetInstance());
+                std::cout << typeid(m_pPseudostate).name() << " init\n";
+                EndTrans(pContext);
+                bResult = true;
+            } else {
+                /* entry-points */
+                /* final-points */
+            }
+            return bResult;
+        }
+
+    public:
+        virtual bool EventProc(Context* pContext, EventId nEventId, EventParams* pParams) {
+            bool bResult = false;
+            m_pLCAState = TopState::GetInstance();
+            /* substms' event-proc */
+            bResult = m_pCurrentState->EventProc(pContext, this, nEventId, pParams);
+            RunToCompletion(pContext);
+            return bResult;
         }
     };
 
-    /*------------------------------------------ S182 --------------------------------------------*/
-    class S182: public TopState {
-        using TThisState  = S182;
-        using TSuperState = TopState;
-    protected:
-        S182() {}
+    class S111Stm: public Statemachine {
     public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                /* entry */
-                std::cout << typeid(this).name() << " entry\n";
+        TopState m_S111Entry1;
+
+        /*------------------------------------------ S14 --------------------------------------------*/
+        class S14: public TopState {
+            using TThisState  = S14;
+            using TSuperState = TopState;
+        protected:
+            S14() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
             }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    /* entry */
+                    std::cout << typeid(this).name() << " entry\n";
+                }
             }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E2:
+                    if (std::cout << "g1\n") {
+                        pStm->BgnTrans(pContext, S15::GetInstance());
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        /*------------------------------------------ S15 ---------------------------------------------*/
+        class S15: public TopState {
+            using TThisState  = S15;
+            using TSuperState = TopState;
+        protected:
+            S15() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    /* entry */
+                    std::cout << typeid(this).name() << " entry\n";
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        /*-------------------------------------- DefaultTrans ----------------------------------------*/
+        virtual bool DefaultTrans(Context* pContext) {
             bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E2:
-                if (std::cout << "g1\n") {
-                    pStm->BgnTrans(pContext, TopState::GetInstance());
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            case E3:
-                if (std::cout << "g1\n") {
-                    pStm->BgnTrans(pContext, TopState::GetInstance());
-                    pStm->m_pParentStm->EventProc(pContext, S18Exit1, nullptr);
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            default:
-                break;
+            /* substms' run-to-completion */
+            if (m_pPseudostate == &m_TopStateStart) {
+                BgnTrans(pContext, S15::GetInstance());
+                std::cout << typeid(m_pPseudostate).name() << " init\n";
+                EndTrans(pContext);
+                bResult = true;
+            } else if (m_pPseudostate == &m_S111Entry1) {
+                BgnTrans(pContext, S14::GetInstance());
+                std::cout << typeid(m_pPseudostate).name() << " init\n";
+                EndTrans(pContext);
+                bResult = true;
+            } else {
+                /* entry-points */
+                /* final-points */
             }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            return bResult;
         }
-    };
-    /*-------------------------------------- DefaultTrans ----------------------------------------*/
-    virtual bool DefaultTrans(Context* pContext) {
-        bool bResult = false;
-        /* substms' run-to-completion */
-        if (m_pPseudostate == &m_TopStateStart) {
-            BgnTrans(pContext, S181::GetInstance());
-            std::cout << typeid(m_pPseudostate).name() << " init\n";
-            EndTrans(pContext);
-            bResult = true;
-        } else if (m_pPseudostate == &m_S18Entry1) {
-            BgnTrans(pContext, S181::GetInstance());
-            std::cout << typeid(m_pPseudostate).name() << " init\n";
-            EndTrans(pContext);
-            bResult = true;
-        } else {
-            /* entry-points */
-            /* final-points */
-        }
-        return bResult;
-    }
 
-public:
-    virtual bool EventProc(Context* pContext, EventId nEventId, EventParams* pParams) {
-        bool bResult = false;
-        m_pLCAState = TopState::GetInstance();
-        /* substms' event-proc */
-        bResult = m_pCurrentState->EventProc(pContext, this, nEventId, pParams);
-        RunToCompletion(pContext);
-        return bResult;
-    }
-};
-
-class S111Stm: public Statemachine {
-public:
-    static Statemachine* GetInstance() {
-        static S111Stm singleInstance;
-        return &singleInstance;
-    }
-
-    static TopState m_S111Entry1;
-
-    /*------------------------------------------ S14 --------------------------------------------*/
-    class S14: public TopState {
-        using TThisState  = S14;
-        using TSuperState = TopState;
-    protected:
-        S14() {}
     public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                /* entry */
-                std::cout << typeid(this).name() << " entry\n";
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+        virtual bool EventProc(Context* pContext, EventId nEventId, EventParams* pParams) {
             bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E2:
-                if (std::cout << "g1\n") {
-                    pStm->BgnTrans(pContext, S15::GetInstance());
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            m_pLCAState = TopState::GetInstance();
+            /* substms' event-proc */
+            bResult = m_pCurrentState->EventProc(pContext, this, nEventId, pParams);
+            RunToCompletion(pContext);
+            return bResult;
         }
     };
 
-    /*------------------------------------------ S15 ---------------------------------------------*/
-    class S15: public TopState {
-        using TThisState  = S15;
-        using TSuperState = TopState;
-    protected:
-        S15() {}
+    class S112Stm: public Statemachine {
     public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                /* entry */
-                std::cout << typeid(this).name() << " entry\n";
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
+        TopState m_S112Entry1;
+        TopState m_S112Entry2;
 
-    /*-------------------------------------- DefaultTrans ----------------------------------------*/
-    virtual bool DefaultTrans(Context* pContext) {
-        bool bResult = false;
-        /* substms' run-to-completion */
-        if (m_pPseudostate == &m_TopStateStart) {
-            BgnTrans(pContext, S15::GetInstance());
-            std::cout << typeid(m_pPseudostate).name() << " init\n";
-            EndTrans(pContext);
-            bResult = true;
-        } else if (m_pPseudostate == &m_S111Entry1) {
-            BgnTrans(pContext, S14::GetInstance());
-            std::cout << typeid(m_pPseudostate).name() << " init\n";
-            EndTrans(pContext);
-            bResult = true;
-        } else {
-            /* entry-points */
-            /* final-points */
-        }
-        return bResult;
-    }
-
-public:
-    virtual bool EventProc(Context* pContext, EventId nEventId, EventParams* pParams) {
-        bool bResult = false;
-        m_pLCAState = TopState::GetInstance();
-        /* substms' event-proc */
-        bResult = m_pCurrentState->EventProc(pContext, this, nEventId, pParams);
-        RunToCompletion(pContext);
-        return bResult;
-    }
-};
-
-class S112Stm: public Statemachine {
-public:
-    static Statemachine* GetInstance() {
-        static S112Stm singleInstance;
-        return &singleInstance;
-    }
-
-    static TopState m_S112Entry1;
-    static TopState m_S112Entry2;
-
-    /*------------------------------------------ S14 --------------------------------------------*/
-    class S16: public TopState {
-        using TThisState  = S16;
-        using TSuperState = TopState;
-    protected:
-        S16() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                /* entry */
-                std::cout << typeid(this).name() << " entry\n";
+        /*------------------------------------------ S14 --------------------------------------------*/
+        class S16: public TopState {
+            using TThisState  = S16;
+            using TSuperState = TopState;
+        protected:
+            S16() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
             }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E3:
-                if (std::cout << "g1\n") {
-                    pStm->BgnTrans(pContext, S17::GetInstance());
-                    pStm->EndTrans(pContext);
-                    bResult = true;
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    /* entry */
+                    std::cout << typeid(this).name() << " entry\n";
                 }
-                break;
-            default:
-                break;
             }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
-
-    /*------------------------------------------ S15 ---------------------------------------------*/
-    class S17: public TopState {
-        using TThisState  = S17;
-        using TSuperState = TopState;
-    protected:
-        S17() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                /* entry */
-                std::cout << typeid(this).name() << " entry\n";
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
-
-    /*-------------------------------------- DefaultTrans ----------------------------------------*/
-    virtual bool DefaultTrans(Context* pContext) {
-        bool bResult = false;
-        /* substms' run-to-completion */
-        if (m_pPseudostate == &m_TopStateStart) {
-            BgnTrans(pContext, S16::GetInstance());
-            std::cout << "s111 init\n";
-            EndTrans(pContext);
-            bResult = true;
-        } else if (m_pPseudostate == &m_S112Entry1) {
-            BgnTrans(pContext, S16::GetInstance());
-            std::cout << typeid(m_pPseudostate).name() << " init\n";
-            EndTrans(pContext);
-            bResult = true;
-        } else if (m_pPseudostate == &m_S112Entry2) {
-            BgnTrans(pContext, S17::GetInstance());
-            std::cout << typeid(m_pPseudostate).name() << " init\n";
-            EndTrans(pContext);
-            bResult = true;
-        } else {
-            /* entry-points */
-            /* final-points */
-        }
-        return bResult;
-    }
-
-public:
-    virtual bool EventProc(Context* pContext, EventId nEventId, EventParams* pParams) {
-        bool bResult = false;
-        m_pLCAState = TopState::GetInstance();
-        /* substms' event-proc */
-        bResult = m_pCurrentState->EventProc(pContext, this, nEventId, pParams);
-        RunToCompletion(pContext);
-        return bResult;
-    }
-};
-
-class MainStm: public Statemachine {
-public:
-    static Statemachine* GetInstance() {
-        static MainStm singleInstance;
-        return &singleInstance;
-    }
-
-    static TopState* m_pS6History;
-    static TopState* m_pS9History;
-
-    /*------------------------------------------- S1 ---------------------------------------------*/
-    class S1: public TopState {
-        using TThisState  = S1;
-        using TSuperState = TopState;
-    protected:
-        S1() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                /* entry */
-                std::cout << typeid(this).name() << " entry\n";
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E1:
-                if (std::cout << "g1\n") {
-                    pStm->BgnTrans(pContext, S2::GetInstance(), &m_S2Start);
-                    pStm->EndTrans(pContext);
-                    bResult = true;
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
                 }
-                break;
-            case E2:
-                if (std::cout << "Enter condition1: ") {
-                    char n;
-                    std::cin >> n;
-                    if (n - '0') {
-                        if (m_pS6History) {
-                            pStm->BgnTrans(pContext, m_pS6History);
-                            pStm->EndTrans(pContext);
-                            bResult = true;
-                        } else {
-                            pStm->BgnTrans(pContext, S6::GetInstance(), &m_S6Start);
-                            pStm->EndTrans(pContext);
-                            bResult = true;
-                        }
-                    } else {
-                        std::cout << "Enter condition2: ";
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E3:
+                    if (std::cout << "g1\n") {
+                        pStm->BgnTrans(pContext, S17::GetInstance());
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        /*------------------------------------------ S15 ---------------------------------------------*/
+        class S17: public TopState {
+            using TThisState  = S17;
+            using TSuperState = TopState;
+        protected:
+            S17() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    /* entry */
+                    std::cout << typeid(this).name() << " entry\n";
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        /*-------------------------------------- DefaultTrans ----------------------------------------*/
+        virtual bool DefaultTrans(Context* pContext) {
+            bool bResult = false;
+            /* substms' run-to-completion */
+            if (m_pPseudostate == &m_TopStateStart) {
+                BgnTrans(pContext, S16::GetInstance());
+                std::cout << "s111 init\n";
+                EndTrans(pContext);
+                bResult = true;
+            } else if (m_pPseudostate == &m_S112Entry1) {
+                BgnTrans(pContext, S16::GetInstance());
+                std::cout << typeid(m_pPseudostate).name() << " init\n";
+                EndTrans(pContext);
+                bResult = true;
+            } else if (m_pPseudostate == &m_S112Entry2) {
+                BgnTrans(pContext, S17::GetInstance());
+                std::cout << typeid(m_pPseudostate).name() << " init\n";
+                EndTrans(pContext);
+                bResult = true;
+            } else {
+                /* entry-points */
+                /* final-points */
+            }
+            return bResult;
+        }
+
+    public:
+        virtual bool EventProc(Context* pContext, EventId nEventId, EventParams* pParams) {
+            bool bResult = false;
+            m_pLCAState = TopState::GetInstance();
+            /* substms' event-proc */
+            bResult = m_pCurrentState->EventProc(pContext, this, nEventId, pParams);
+            RunToCompletion(pContext);
+            return bResult;
+        }
+    };
+
+    class MainStm: public Statemachine {
+    public:
+        TopState* m_pS6History;
+        TopState* m_pS9History;
+
+        S111Stm   m_S111Stm;
+        S112Stm   m_S112Stm;
+        S18Stm    m_S18Stm;
+
+        TopState m_S2Start;
+        TopState m_S6Start;
+        TopState m_S9Start;
+        TopState m_S11Start;
+        TopState m_Junction;
+        TopState m_S18Exit1;
+
+        /*------------------------------------------- S1 ---------------------------------------------*/
+        class S1: public TopState {
+            using TThisState  = S1;
+            using TSuperState = TopState;
+        protected:
+            S1() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    /* entry */
+                    std::cout << typeid(this).name() << " entry\n";
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E1:
+                    if (std::cout << "g1\n") {
+                        pStm->BgnTrans(pContext, S2::GetInstance(), &((MainStm*)pStm)->m_S2Start);
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                case E2:
+                    if (std::cout << "Enter condition1: ") {
+                        char n;
                         std::cin >> n;
                         if (n - '0') {
-                            pStm->BgnTrans(pContext, S10::GetInstance());
+                            if (((MainStm*)pStm)->m_pS6History) {
+                                pStm->BgnTrans(pContext, ((MainStm*)pStm)->m_pS6History);
+                                pStm->EndTrans(pContext);
+                                bResult = true;
+                            } else {
+                                pStm->BgnTrans(pContext, S6::GetInstance(), &((MainStm*)pStm)->m_S6Start);
+                                pStm->EndTrans(pContext);
+                                bResult = true;
+                            }
+                        } else {
+                            std::cout << "Enter condition2: ";
+                            std::cin >> n;
+                            if (n - '0') {
+                                pStm->BgnTrans(pContext, S10::GetInstance());
+                                pStm->EndTrans(pContext);
+                                bResult = true;
+                            } else {
+                                pStm->BgnTrans(pContext, S9::GetInstance(), &((MainStm*)pStm)->m_S9Start);
+                                pStm->EndTrans(pContext);
+                                bResult = true;
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        /*------------------------------------------- S2 ---------------------------------------------*/
+        class S2: public TopState {
+            using TThisState  = S2;
+            using TSuperState = TopState ;
+        protected:
+            S2() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E3:
+                    if (std::cout << "g\n") {
+                        if (((MainStm*)pStm)->m_pS6History) {
+                            pStm->BgnTrans(pContext, ((MainStm*)pStm)->m_pS6History);
                             pStm->EndTrans(pContext);
                             bResult = true;
                         } else {
-                            pStm->BgnTrans(pContext, S9::GetInstance(), &m_S9Start);
+                            pStm->BgnTrans(pContext, S6::GetInstance(), &((MainStm*)pStm)->m_S6Start);
                             pStm->EndTrans(pContext);
                             bResult = true;
                         }
                     }
-                }
-                break;
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
-
-    /*------------------------------------------- S2 ---------------------------------------------*/
-    class S2: public TopState {
-        using TThisState  = S2;
-        using TSuperState = TopState ;
-    protected:
-        S2() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E3:
-                if (std::cout << "g\n") {
-                    if (m_pS6History) {
-                        pStm->BgnTrans(pContext, m_pS6History);
-                        pStm->EndTrans(pContext);
-                        bResult = true;
-                    } else {
-                        pStm->BgnTrans(pContext, S6::GetInstance(), &m_S6Start);
-                        pStm->EndTrans(pContext);
-                        bResult = true;
-                    }
-                }
-                break;
-            case E2:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, S5::GetInstance());
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
-
-    static TopState m_S2Start;
-
-    class S3: public S2 {
-        using TThisState  = S3;
-        using TSuperState = S2;
-    protected:
-        S3() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E0:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, S4::GetInstance());
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            case E1:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, S5::GetInstance());
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
-
-    class S4: public S2 {
-        using TThisState  = S4;
-        using TSuperState = S2;
-    protected:
-        S4() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E0:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, S2::GetInstance());
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
-
-    /*------------------------------------------- S5 ---------------------------------------------*/
-    class S5: public TopState {
-        using TThisState  = S5;
-        using TSuperState = TopState;
-    protected:
-        S5() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E0:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, &m_Junction);
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
-
-    /*------------------------------------------- S6 ---------------------------------------------*/
-    class S6: public TopState {
-        using TThisState  = S6;
-        using TSuperState = TopState;
-    protected:
-        S6() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E1:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, &m_Junction);
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            case E2:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, S8::GetInstance(), true);
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
-
-    static TopState m_S6Start;
-
-    class S7: public S6 {
-        using TThisState  = S7;
-        using TSuperState = S6;
-    protected:
-        S7() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
-                /* history */
-                m_pS6History = GetInstance();
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E1:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, S8::GetInstance());
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
-
-    class S8: public S6 {
-        using TThisState  = S8;
-        using TSuperState = S6;
-    protected:
-        S8() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
-                /* history */
-                m_pS6History = GetInstance();
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
-
-    /*------------------------------------------- S9 ---------------------------------------------*/
-    class S9: public TopState {
-        using TThisState  = S9;
-        using TSuperState = TopState;
-    protected:
-        S9() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
-                /* history */
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E1:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, S91::GetInstance(), true);
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            case E2:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, S92::GetInstance());
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            case E3:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, S11::GetInstance(), &m_S11Start);
-                    S111Stm::GetInstance()->Reset(pContext, pStm, &S111Stm::m_S111Entry1);
-                    S112Stm::GetInstance()->Reset(pContext, pStm, &S112Stm::m_S112Entry1);
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
-
-    static TopState m_S9Start;
-
-    class S91: public S9 {
-        using TThisState  = S91;
-        using TSuperState = S9;
-    protected:
-        S91() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
-                /* history */
-                m_pS9History = GetInstance();
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
-
-    class S92: public S9 {
-        using TThisState  = S92;
-        using TSuperState = S9;
-    protected:
-        S92() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
-                /* history */
-                m_pS9History = GetInstance();
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
-
-    /*------------------------------------------- S10 --------------------------------------------*/
-    class S10: public TopState {
-        using TThisState  = S10;
-        using TSuperState = TopState;
-    protected:
-        S10() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
-                /* history */
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E1:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, S10::GetInstance());
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            case E2:
-                if (std::cout << "Enter condition: \n") {
-                    char n;
-                    std::cin >> n;
-                    if (n - '0' == 0) {
-                        pStm->BgnTrans(pContext, S7::GetInstance());
-                        std::cout << "a\n";
-                        pStm->EndTrans(pContext);
-                        bResult = true;
-                    } else if (n - '0' == 1) {
-                        pStm->BgnTrans(pContext, S18::GetInstance());
-                        std::cout << "a\n";
-                        S18Stm::GetInstance()->Reset(pContext, pStm, &S18Stm::m_S18Entry1);
-                        pStm->EndTrans(pContext);
-                        bResult = true;
-                    } else {
-                        pStm->BgnTrans(pContext, S11::GetInstance(), &m_S11Start);
+                    break;
+                case E2:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, S5::GetInstance());
                         std::cout << "a\n";
                         pStm->EndTrans(pContext);
                         bResult = true;
                     }
+                    break;
+                default:
+                    break;
                 }
-                break;
-            default:
-                break;
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
             }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
+        };
 
-    /*------------------------------------------- S11 --------------------------------------------*/
-    class S11: public TopState {
-        using TThisState  = S11;
-        using TSuperState = TopState;
-    protected:
-        S11() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                S111Stm::GetInstance()->Reset(pContext, pStm, nullptr);
-                S112Stm::GetInstance()->Reset(pContext, pStm, nullptr);
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
-                /* history */
+        class S3: public S2 {
+            using TThisState  = S3;
+            using TSuperState = S2;
+        protected:
+            S3() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
             }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-                S111Stm::GetInstance()->Abort(pContext);
-                S112Stm::GetInstance()->Abort(pContext);
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E4:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, TopState::GetInstance());
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
                 }
-                break;
-            case E5:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, m_pS9History);
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
                 }
-                break;
-            default:
-                break;
             }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
-
-    static TopState m_S11Start;
-
-    class S12: public S11 {
-        using TThisState  = S12;
-        using TSuperState = S11;
-    protected:
-        S12() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
-                /* history */
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E1:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, S13::GetInstance());
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
-
-    class S13: public S11 {
-        using TThisState  = S13;
-        using TSuperState = S11;
-    protected:
-        S13() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
-                /* history */
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E5:
-                if (IsIn<S111Stm::S15>(S111Stm::GetInstance()->m_pCurrentState)) {
-                    pStm->BgnTrans(pContext, S20::GetInstance());
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
-
-    /*----------------------------------------- Junction -----------------------------------------*/
-    static TopState m_Junction;
-
-    /*------------------------------------------- S18 --------------------------------------------*/
-    class S18: public TopState {
-        using TThisState  = S18;
-        using TSuperState = TopState;
-    protected:
-        S18() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                S18Stm::GetInstance()->Reset(pContext, pStm, nullptr);
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-                S18Stm::GetInstance()->Abort(pContext);
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E3:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, S19::GetInstance());
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            case E4:
-                if (std::cout << "g\n") {
-                    if (m_pS6History) {
-                        pStm->BgnTrans(pContext, m_pS6History);
-                        pStm->EndTrans(pContext);
-                        bResult = true;
-                    } else {
-                        pStm->BgnTrans(pContext, S6::GetInstance(), &m_S6Start);
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E0:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, S4::GetInstance());
+                        std::cout << "a\n";
                         pStm->EndTrans(pContext);
                         bResult = true;
                     }
+                    break;
+                case E1:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, S5::GetInstance());
+                        std::cout << "a\n";
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                default:
+                    break;
                 }
-                break;
-            default:
-                break;
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
             }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
-        }
-    };
+        };
 
-    /*------------------------------------------- S19 --------------------------------------------*/
-    class S19: public TopState {
-        using TThisState  = S19;
-        using TSuperState = TopState;
-    protected:
-        S19() {}
-    public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
+        class S4: public S2 {
+            using TThisState  = S4;
+            using TSuperState = S2;
+        protected:
+            S4() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
             }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
+                }
             }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E0:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, S2::GetInstance());
+                        std::cout << "a\n";
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        /*------------------------------------------- S5 ---------------------------------------------*/
+        class S5: public TopState {
+            using TThisState  = S5;
+            using TSuperState = TopState;
+        protected:
+            S5() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E0:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, &((MainStm*)pStm)->m_Junction);
+                        std::cout << "a\n";
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        /*------------------------------------------- S6 ---------------------------------------------*/
+        class S6: public TopState {
+            using TThisState  = S6;
+            using TSuperState = TopState;
+        protected:
+            S6() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E1:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, &((MainStm*)pStm)->m_Junction);
+                        std::cout << "a\n";
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                case E2:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, S8::GetInstance(), true);
+                        std::cout << "a\n";
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        class S7: public S6 {
+            using TThisState  = S7;
+            using TSuperState = S6;
+        protected:
+            S7() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
+                    /* history */
+                    ((MainStm*)pStm)->m_pS6History = GetInstance();
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E1:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, S8::GetInstance());
+                        std::cout << "a\n";
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        class S8: public S6 {
+            using TThisState  = S8;
+            using TSuperState = S6;
+        protected:
+            S8() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
+                    /* history */
+                    ((MainStm*)pStm)->m_pS6History = GetInstance();
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        /*------------------------------------------- S9 ---------------------------------------------*/
+        class S9: public TopState {
+            using TThisState  = S9;
+            using TSuperState = TopState;
+        protected:
+            S9() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
+                    /* history */
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E1:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, S91::GetInstance(), true);
+                        std::cout << "a\n";
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                case E2:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, S92::GetInstance());
+                        std::cout << "a\n";
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                case E3:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, S11::GetInstance(), &((MainStm*)pStm)->m_S11Start);
+                        ((MainStm*)pStm)->m_S111Stm.Reset(pContext, pStm, &((MainStm*)pStm)->m_S111Stm.m_S111Entry1);
+                        ((MainStm*)pStm)->m_S112Stm.Reset(pContext, pStm, &((MainStm*)pStm)->m_S112Stm.m_S112Entry1);
+                        std::cout << "a\n";
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        class S91: public S9 {
+            using TThisState  = S91;
+            using TSuperState = S9;
+        protected:
+            S91() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
+                    /* history */
+                    ((MainStm*)pStm)->m_pS9History = GetInstance();
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        class S92: public S9 {
+            using TThisState  = S92;
+            using TSuperState = S9;
+        protected:
+            S92() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
+                    /* history */
+                    ((MainStm*)pStm)->m_pS9History = GetInstance();
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        /*------------------------------------------- S10 --------------------------------------------*/
+        class S10: public TopState {
+            using TThisState  = S10;
+            using TSuperState = TopState;
+        protected:
+            S10() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
+                    /* history */
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E1:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, S10::GetInstance());
+                        std::cout << "a\n";
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                case E2:
+                    if (std::cout << "Enter condition: \n") {
+                        char n;
+                        std::cin >> n;
+                        if (n - '0' == 0) {
+                            pStm->BgnTrans(pContext, S7::GetInstance());
+                            std::cout << "a\n";
+                            pStm->EndTrans(pContext);
+                            bResult = true;
+                        } else if (n - '0' == 1) {
+                            pStm->BgnTrans(pContext, S18::GetInstance());
+                            std::cout << "a\n";
+                            ((MainStm*)pStm)->m_S18Stm.Reset(pContext, pStm, &((MainStm*)pStm)->m_S18Stm.m_S18Entry1);
+                            pStm->EndTrans(pContext);
+                            bResult = true;
+                        } else {
+                            pStm->BgnTrans(pContext, S11::GetInstance(), &((MainStm*)pStm)->m_S11Start);
+                            std::cout << "a\n";
+                            pStm->EndTrans(pContext);
+                            bResult = true;
+                        }
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        /*------------------------------------------- S11 --------------------------------------------*/
+        class S11: public TopState {
+            using TThisState  = S11;
+            using TSuperState = TopState;
+        protected:
+            S11() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    ((MainStm*)pStm)->m_S111Stm.Reset(pContext, pStm, nullptr);
+                    ((MainStm*)pStm)->m_S112Stm.Reset(pContext, pStm, nullptr);
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
+                    /* history */
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                    ((MainStm*)pStm)->m_S111Stm.Abort(pContext);
+                    ((MainStm*)pStm)->m_S112Stm.Abort(pContext);
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E4:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, TopState::GetInstance());
+                        std::cout << "a\n";
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                case E5:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, ((MainStm*)pStm)->m_pS9History);
+                        std::cout << "a\n";
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        class S12: public S11 {
+            using TThisState  = S12;
+            using TSuperState = S11;
+        protected:
+            S12() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
+                    /* history */
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E1:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, S13::GetInstance());
+                        std::cout << "a\n";
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        class S13: public S11 {
+            using TThisState  = S13;
+            using TSuperState = S11;
+        protected:
+            S13() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
+                    /* history */
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E5:
+                    if (IsIn<S111Stm::S15>(((MainStm*)pStm)->m_S111Stm.m_pCurrentState)) {
+                        pStm->BgnTrans(pContext, S20::GetInstance());
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+
+        /*------------------------------------------- S18 --------------------------------------------*/
+        class S18: public TopState {
+            using TThisState  = S18;
+            using TSuperState = TopState;
+        protected:
+            S18() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    ((MainStm*)pStm)->m_S18Stm.Reset(pContext, pStm, nullptr);
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                    ((MainStm*)pStm)->m_S18Stm.Abort(pContext);
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E3:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, S19::GetInstance());
+                        std::cout << "a\n";
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                case E4:
+                    if (std::cout << "g\n") {
+                        if (((MainStm*)pStm)->m_pS6History) {
+                            pStm->BgnTrans(pContext, ((MainStm*)pStm)->m_pS6History);
+                            pStm->EndTrans(pContext);
+                            bResult = true;
+                        } else {
+                            pStm->BgnTrans(pContext, S6::GetInstance(), &((MainStm*)pStm)->m_S6Start);
+                            pStm->EndTrans(pContext);
+                            bResult = true;
+                        }
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        /*------------------------------------------- S19 --------------------------------------------*/
+        class S19: public TopState {
+            using TThisState  = S19;
+            using TSuperState = TopState;
+        protected:
+            S19() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E0:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, S20::GetInstance());
+                        std::cout << "a\n";
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        /*------------------------------------------- S20 --------------------------------------------*/
+        class S20: public TopState {
+            using TThisState  = S20;
+            using TSuperState = TopState;
+        protected:
+            S20() {}
+        public:
+            static TopState* GetInstance() {
+                static TThisState singleInstance;
+                return &singleInstance;
+            }
+            virtual void Entry(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsEnterable<TThisState>()) {
+                    /* substms' reset */
+                    /* entry */
+                    TSuperState::GetInstance()->Entry(pContext, pStm);
+                    std::cout << typeid(this).name() << " entry\n";
+                }
+            }
+            virtual void Exit(Context* pContext, Statemachine* pStm) {
+                if (pStm->IsExitable<TThisState>()) {
+                    /* exit */
+                    std::cout << typeid(this).name() << " exit\n";
+                    TSuperState::GetInstance()->Exit(pContext, pStm);
+                    /* substms' abort */
+                }
+            }
+            virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+                bool bResult = false;
+                pStm->m_pSourceState = TThisState::GetInstance();
+                switch (nEventId) {
+                case E1:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, TopState::GetInstance());
+                        std::cout << "a\n";
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                case E2:
+                    if (std::cout << "g\n") {
+                        pStm->BgnTrans(pContext, S11::GetInstance(), &((MainStm*)pStm)->m_S11Start);
+                        std::cout << "a\n";
+                        ((MainStm*)pStm)->m_S112Stm.Reset(pContext, pStm, &((MainStm*)pStm)->m_S112Stm.m_S112Entry2);
+                        pStm->EndTrans(pContext);
+                        bResult = true;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            }
+        };
+
+        /*-------------------------------------- DefaultTrans ----------------------------------------*/
+        virtual bool DefaultTrans(Context* pContext) {
             bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E0:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, S20::GetInstance());
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            default:
-                break;
+            /* substms' run-to-completion */
+            if (m_pPseudostate == &m_TopStateStart) {
+                BgnTrans(pContext, S1::GetInstance());
+                std::cout << typeid(m_pPseudostate).name() << " init\n";
+                EndTrans(pContext);
+                bResult = true;
+            } else if (m_pPseudostate == &m_S2Start) {
+                BgnTrans(pContext, S3::GetInstance());
+                std::cout << typeid(m_pPseudostate).name() << " init\n";
+                EndTrans(pContext);
+                bResult = true;
+            } else if (m_pPseudostate == &m_S6Start) {
+                BgnTrans(pContext, S7::GetInstance());
+                std::cout << typeid(m_pPseudostate).name() << " init\n";
+                EndTrans(pContext);
+                bResult = true;
+            } else if (m_pPseudostate == &m_S9Start) {
+                BgnTrans(pContext, S91::GetInstance());
+                std::cout << typeid(m_pPseudostate).name() << " init\n";
+                EndTrans(pContext);
+                bResult = true;
+            } else if (m_pPseudostate == &m_S11Start) {
+                BgnTrans(pContext, S12::GetInstance());
+                std::cout << typeid(m_pPseudostate).name() << " init\n";
+                EndTrans(pContext);
+                bResult = true;
+            } else if (m_pPseudostate == &m_S18Exit1) {
+                BgnTrans(pContext, S19::GetInstance());
+                std::cout << typeid(m_pPseudostate).name() << " init\n";
+                EndTrans(pContext);
+                bResult = true;
+            } else if (m_pPseudostate == &m_Junction) {
+                BgnTrans(pContext, S18::GetInstance());
+                std::cout << typeid(m_pPseudostate).name() << " init\n";
+                EndTrans(pContext);
+                bResult = true;
+            } else {
+                /* entry-points */
+                /* final-points */
             }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            return bResult;
         }
-    };
 
-    /*------------------------------------------- S20 --------------------------------------------*/
-    class S20: public TopState {
-        using TThisState  = S20;
-        using TSuperState = TopState;
-    protected:
-        S20() {}
     public:
-        static TopState* GetInstance() {
-            static TThisState singleInstance;
-            return &singleInstance;
-        }
-        virtual void Entry(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsEnterable<TThisState>()) {
-                /* substms' reset */
-                /* entry */
-                TSuperState::GetInstance()->Entry(pContext, pStm);
-                std::cout << typeid(this).name() << " entry\n";
-            }
-        }
-        virtual void Exit(Context* pContext, Statemachine* pStm) {
-            if (pStm->IsExitable<TThisState>()) {
-                /* exit */
-                std::cout << typeid(this).name() << " exit\n";
-                TSuperState::GetInstance()->Exit(pContext, pStm);
-                /* substms' abort */
-            }
-        }
-        virtual bool EventProc(Context* pContext, Statemachine* pStm, EventId nEventId, EventParams* pParams) {
+        virtual bool EventProc(Context* pContext, EventId nEventId, EventParams* pParams) {
             bool bResult = false;
-            pStm->m_pSourceState = TThisState::GetInstance();
-            switch (nEventId) {
-            case E1:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, TopState::GetInstance());
-                    std::cout << "a\n";
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            case E2:
-                if (std::cout << "g\n") {
-                    pStm->BgnTrans(pContext, S11::GetInstance(), &m_S11Start);
-                    std::cout << "a\n";
-                    S112Stm::GetInstance()->Reset(pContext, pStm, &S112Stm::m_S112Entry2);
-                    pStm->EndTrans(pContext);
-                    bResult = true;
-                }
-                break;
-            default:
-                break;
-            }
-            return bResult ? bResult : TSuperState::GetInstance()->EventProc(pContext, pStm, nEventId, pParams);
+            m_pLCAState = TopState::GetInstance();
+            /* substms' event-proc */
+            bResult |= m_S111Stm.EventProc(pContext, nEventId, pParams);
+            bResult |= m_S112Stm.EventProc(pContext, nEventId, pParams);
+            bResult |= m_S18Stm.EventProc(pContext, nEventId, pParams);
+
+            /* this stm's event-proc */
+            bResult |= m_pCurrentState->EventProc(pContext, this, nEventId, pParams);
+            RunToCompletion(pContext);
+            return bResult;
         }
     };
 
-    /*-------------------------------------- DefaultTrans ----------------------------------------*/
-    virtual bool DefaultTrans(Context* pContext) {
-        bool bResult = false;
-        /* substms' run-to-completion */
-        if (m_pPseudostate == &m_TopStateStart) {
-            BgnTrans(pContext, S1::GetInstance());
-            std::cout << typeid(m_pPseudostate).name() << " init\n";
-            EndTrans(pContext);
-            bResult = true;
-        } else if (m_pPseudostate == &m_S2Start) {
-            BgnTrans(pContext, S3::GetInstance());
-            std::cout << typeid(m_pPseudostate).name() << " init\n";
-            EndTrans(pContext);
-            bResult = true;
-        } else if (m_pPseudostate == &m_S6Start) {
-            BgnTrans(pContext, S7::GetInstance());
-            std::cout << typeid(m_pPseudostate).name() << " init\n";
-            EndTrans(pContext);
-            bResult = true;
-        } else if (m_pPseudostate == &m_S9Start) {
-            BgnTrans(pContext, S91::GetInstance());
-            std::cout << typeid(m_pPseudostate).name() << " init\n";
-            EndTrans(pContext);
-            bResult = true;
-        } else if (m_pPseudostate == &m_S11Start) {
-            BgnTrans(pContext, S12::GetInstance());
-            std::cout << typeid(m_pPseudostate).name() << " init\n";
-            EndTrans(pContext);
-            bResult = true;
-        } else if (m_pPseudostate == &m_Junction) {
-            BgnTrans(pContext, S18::GetInstance());
-            std::cout << typeid(m_pPseudostate).name() << " init\n";
-            EndTrans(pContext);
-            bResult = true;
-        } else {
-            /* entry-points */
-            /* final-points */
-        }
-        return bResult;
-    }
-
-public:
-    virtual bool EventProc(Context* pContext, EventId nEventId, EventParams* pParams) {
-        bool bResult = false;
-        m_pLCAState = TopState::GetInstance();
-        /* substms' event-proc */
-        bResult |= S111Stm::GetInstance()->EventProc(pContext, nEventId, pParams);
-        bResult |= S112Stm::GetInstance()->EventProc(pContext, nEventId, pParams);
-        bResult |= S18Stm::GetInstance()->EventProc(pContext, nEventId, pParams);
-
-        /* this stm's event-proc */
-        bResult |= m_pCurrentState->EventProc(pContext, this, nEventId, pParams);
-        RunToCompletion(pContext);
-        return bResult;
-    }
-};
-
-class Context {
     MainStm mainStm;
 public:
     bool Start() {
@@ -1576,20 +1563,7 @@ public:
     }
 };
 
-TopState* MainStm::m_pS6History = nullptr;
-TopState* MainStm::m_pS9History = nullptr;
-
 /*---------------------------------------------------------------------------------------------*/
-Common::TopState Common::Statemachine::m_TopStateStart;
-Common::TopState S18Stm::m_S18Entry1;
-Common::TopState S111Stm::m_S111Entry1;
-Common::TopState S112Stm::m_S112Entry1;
-Common::TopState S112Stm::m_S112Entry2;
-Common::TopState MainStm::m_S2Start;
-Common::TopState MainStm::m_S6Start;
-Common::TopState MainStm::m_S9Start;
-Common::TopState MainStm::m_S11Start;
-Common::TopState MainStm::m_Junction;
 
 int main() {
     std::cout << "Hello World!\n";
