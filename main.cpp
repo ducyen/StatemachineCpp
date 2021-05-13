@@ -72,6 +72,11 @@ public:
             bool bResult = dynamic_cast<TCompositeState*>(pLeafState) != nullptr;
             return bResult;
         }
+        template<class TCompositeState = TopState>
+        bool IsIn() {
+            bool bResult = dynamic_cast<TCompositeState*>(m_pCurrentState) != nullptr;
+            return bResult;
+        }
         template<class TThisState = TopState>
         bool IsEnterable() {
             bool isThisLCA = IsIn<TThisState>(m_pLCAState);
@@ -546,6 +551,20 @@ class Context {
         TopState m_S11Start;
         TopState m_Junction;
         TopState m_S18Exit1;
+
+        virtual bool EventProc(Context* pContext, EventId nEventId, EventParams* pParams) {
+            bool bResult = false;
+            m_pLCAState = TopState::GetInstance();
+            /* substms' event-proc */
+            bResult |= m_S111Stm.EventProc(pContext, nEventId, pParams);
+            bResult |= m_S112Stm.EventProc(pContext, nEventId, pParams);
+            bResult |= m_S18Stm.EventProc(pContext, nEventId, pParams);
+
+            /* this stm's event-proc */
+            bResult |= m_pCurrentState->EventProc(pContext, this, nEventId, pParams);
+            RunToCompletion(pContext);
+            return bResult;
+        }
 
         /*------------------------------------------- S1 ---------------------------------------------*/
         class S1: public TopState {
@@ -1536,20 +1555,6 @@ class Context {
             return bResult;
         }
 
-    public:
-        virtual bool EventProc(Context* pContext, EventId nEventId, EventParams* pParams) {
-            bool bResult = false;
-            m_pLCAState = TopState::GetInstance();
-            /* substms' event-proc */
-            bResult |= m_S111Stm.EventProc(pContext, nEventId, pParams);
-            bResult |= m_S112Stm.EventProc(pContext, nEventId, pParams);
-            bResult |= m_S18Stm.EventProc(pContext, nEventId, pParams);
-
-            /* this stm's event-proc */
-            bResult |= m_pCurrentState->EventProc(pContext, this, nEventId, pParams);
-            RunToCompletion(pContext);
-            return bResult;
-        }
     };
 
     MainStm mainStm;
